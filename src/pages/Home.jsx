@@ -7,6 +7,7 @@ export default function Home() {
   const { items, status, error } = useSelector((state) => state.users);
 
   const [query, setQuery] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
     if (status === "idle") {
@@ -37,11 +38,9 @@ export default function Home() {
   );
 
   return (
-    <div className="container" style={{ marginTop: "30px", maxWidth: "1000px" }}>
-      <div className="card shadow p-4">
-        <h2 className="mb-4 text-center">
-          📋 User List
-        </h2>
+    <div className="container-fluid d-flex justify-content-center" style={{ marginTop: "50px" }}>
+      <div className="card shadow p-4 w-100" style={{ maxWidth: "1000px" }}>
+        <h2 className="mb-4 text-center">📋 User List</h2>
 
         <div className="mb-4">
           <input
@@ -54,8 +53,8 @@ export default function Home() {
         </div>
 
         <div className="table-responsive">
-          <table className="table table-hover table-bordered align-middle">
-            <thead className="table-dark text-center">
+          <table className="table table-hover table-bordered align-middle text-center">
+            <thead className="table-dark">
               <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Email</th>
@@ -65,10 +64,12 @@ export default function Home() {
             <tbody>
               {filtered.length > 0 ? (
                 filtered.map((user) => (
-                  <tr key={user.id}>
-                    <td>
-                      <strong>{user.name}</strong>
-                    </td>
+                  <tr
+                    key={user.id}
+                    style={{ cursor: "pointer" }}
+                    onClick={() => setSelectedUser(user)}
+                  >
+                    <td><strong>{user.name}</strong></td>
                     <td>{user.email}</td>
                     <td>{user.company?.name}</td>
                   </tr>
@@ -84,6 +85,49 @@ export default function Home() {
           </table>
         </div>
       </div>
+
+      {selectedUser && (
+        <div
+          className="modal show fade d-block"
+          tabIndex="-1"
+          style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+          onClick={() => setSelectedUser(null)}
+        >
+          <div
+            className="modal-dialog modal-dialog-centered"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{selectedUser.name}</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setSelectedUser(null)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                <p><b>Email:</b> {selectedUser.email}</p>
+                <p><b>Company:</b> {selectedUser.company?.name}</p>
+                <p><b>Phone:</b> {selectedUser.phone}</p>
+                <p><b>Website:</b> {selectedUser.website}</p>
+                <p>
+                  <b>Address:</b> {selectedUser.address?.street},{" "}
+                  {selectedUser.address?.city}
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setSelectedUser(null)}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
